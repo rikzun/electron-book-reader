@@ -10,22 +10,35 @@
       </div>
     </div>
     <div id="content">
-      <Book ref="bookBody"/>
+      <Book />
     </div>
     <div id="footer">
-      <button @click="$refs.bookBody.openBook()">Открыть</button>
+      <button @click="fileDialog">Открыть</button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { ipcRenderer } from 'electron'
 import Book from './components/Book.vue'
 
 @Component({components: {Book}})
 export default class App extends Vue {
-  ipc = ipcRenderer
+
+  fileDialog() {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept=".fb2"
+    input.click()
+    input.onchange = () => this.openFile(input.files as FileList)
+  }
+
+  openFile(files: FileList) {
+    const reader = new FileReader()
+    reader.readAsText(files[0])
+
+    reader.result
+  }
 }
 </script>
 

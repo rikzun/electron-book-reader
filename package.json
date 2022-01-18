@@ -9,6 +9,7 @@
   "homepage": "https://github.com/rikzun",
   "main": "background.js",
   "scripts": {
+    "vue:serve": "vue-cli-service serve",
     "electron:serve": "vue-cli-service electron:serve",
     "electron:build--win:portable": "vue-cli-service electron:build --windows portable",
     "electron:build--win:setup": "vue-cli-service electron:build --windows msi",

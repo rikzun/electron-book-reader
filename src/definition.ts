@@ -19,128 +19,255 @@ export class Chapter {
   ) {}
 }
 
-export const genre = {
-  'sf_history': 'Альтернативная история',
-  'sf_action': 'Боевая фантастика',
-  'sf_epic': 'Эпическая фантастика',
-  'sf_heroic': 'Героическая фантастика',
-  'sf_detective': 'Детективная фантастика',
-  'sf_cyberpunk': 'Киберпанк',
-  'sf_space': 'Космическая фантастика',
-  'sf_social': 'Социально-психологическая фантастика',
-  'sf_horror': 'Ужасы и Мистика',
-  'sf_humor': 'Юмористическая фантастика',
-  'sf_fantasy': 'Фэнтези',
-  'sf': 'Научная Фантастика',
+export class Book {
+  titleInfo: {
+    title: string
+    author: {
+      firstName?: string
+      middleName?: string
+      lastName?: string
+      nickname?: string,
+      homePage?: string,
+      email?: string
+    }[]
+    genre?: string[]
+    annotation?: NodeContent[]
+    lang: string
+    srcLang?: string
+  }
+  
+  body: {
+    title?: NodeContent[],
+    chapters: Chapter[]
+  }
 
-  'det_classic': 'Классический детектив',
-  'det_police': 'Полицейский детектив',
-  'det_action': 'Боевик',
-  'det_irony': 'Иронический детектив',
-  'det_history': 'Исторический детектив',
-  'det_espionage': 'Шпионский детектив',
-  'det_crime': 'Криминальный детектив',
-  'det_political': 'Политический детектив',
-  'det_maniac': 'Маньяки',
-  'det_hard': 'Крутой детектив',
-  'thriller': 'Триллер',
-  'detective': 'Детектив',
+  document: Document
 
-  'prose_classic': 'Классическая проза',
-  'prose_history': 'Историческая проза',
-  'prose_contemporary': 'Современная прозa',
-  'prose_counter': 'Контркультура',
-  'prose_rus_classic': 'Русская классическая проза',
-  'prose_su_classics': 'Советская классическая проза',
+  constructor(file: string) {
+    this.titleInfo = {
+      title: undefined!,
+      author: [],
+      lang: undefined!
+    }
 
-  'love_contemporary': 'Современные любовные романы',
-  'love_history': 'Исторические любовные романы',
-  'love_detective': 'Остросюжетные любовные романы',
-  'love_short': 'Короткие любовные романы',
-  'love_erotica': 'Эротика',
+    this.body = {
+      chapters: []
+    }
 
-  'adv_western': 'Вестерн',
-  'adv_history': 'Исторические приключения',
-  'adv_indian': 'Приключения про индейцев',
-  'adv_maritime': 'Морские приключения',
-  'adv_geo': 'Путешествия и география',
-  'adv_animal': 'Природа и животные',
-  'adventure': 'Приключения',
+    this.document = new DOMParser().parseFromString(file, 'application/xml')
+    document.book = this
 
-  'child_tale': 'Сказка',
-  'child_verse': 'Детские стихи',
-  'child_prose': 'Детскиая проза',
-  'child_sf': 'Детская фантастика',
-  'child_det': 'Детские остросюжетные',
-  'child_adv': 'Детские приключения',
-  'child_education': 'Детская образовательная литература',
-  'children': 'Детская литература',
+    for (const segment of this.document.getElementsByTagName('FictionBook')[0].children) {
+      switch (segment.nodeName) {
 
-  'poetry': 'Поэзия',
-  'dramaturgy': 'Драматургия',
+        case 'description': {
+          for (const descriptionChild of segment.children) {
+            switch (descriptionChild.nodeName) {
 
-  'antique_ant': 'Античная литература',
-  'antique_european': 'Европейская старинная литература',
-  'antique_russian': 'Древнерусская литература',
-  'antique_east': 'Древневосточная литература',
-  'antique_myths': 'Мифы. Легенды. Эпос',
-  'antique': 'Старинная литература',
+              case 'title-info': {
+                for (const titleChild of descriptionChild.children) {
+                  switch (titleChild.nodeName) {
 
-  'sci_history': 'История',
-  'sci_psychology': 'Психология',
-  'sci_culture': 'Культурология',
-  'sci_religion': 'Религиоведение',
-  'sci_philosophy': 'Философия',
-  'sci_politics': 'Политика',
-  'sci_business': 'Деловая литература',
-  'sci_juris': 'Юриспруденция',
-  'sci_linguistic': 'Языкознание',
-  'sci_medicine': 'Медицина',
-  'sci_phys': 'Физика',
-  'sci_math': 'Математика',
-  'sci_chem': 'Химия',
-  'sci_biology': 'Биология',
-  'sci_tech': 'Технические науки',
-  'science': 'Научная литература',
+                    case 'book-title': {
+                      this.titleInfo.title = titleChild.textContent as string
+                      break
+                    }
 
-  'comp_www': 'Интернет',
-  'comp_programming': 'Программирование',
-  'comp_hard': 'Аппаратное обеспечение',
-  'comp_soft': 'Программы',
-  'comp_db': 'Базы данных',
-  'comp_osnet': 'ОС и Сети',
-  'computers': 'Компьтерная литература',
+                    case 'author': {
+                      const index = this.titleInfo.author.push({}) - 1
 
-  'ref_encyc': 'Энциклопедии',
-  'ref_dict': 'Словари',
-  'ref_ref': 'Справочники',
-  'ref_guide': 'Руководства',
-  'reference': 'Справочная литература',
+                      for (const authorChild of titleChild.children) {
+                        switch (authorChild.nodeName) {
 
-  'nonf_biography': 'Биографии и Мемуары',
-  'nonf_publicism': 'Публицистика',
-  'nonf_criticism': 'Критика',
-  'design': 'Искусство и Дизайн',
-  'nonfiction': 'Документальная литература',
+                          case 'first-name': {
+                            this.titleInfo.author[index].firstName = authorChild.textContent as string
+                            break
+                          }
 
-  'religion_rel': 'Религия',
-  'religion_esoterics': 'Эзотерика',
-  'religion_self': 'Самосовершенствование',
-  'religion': 'Религионая литература',
+                          case 'middle-name': {
+                            this.titleInfo.author[index].middleName = authorChild.textContent as string
+                            break
+                          }
 
-  'humor_anecdote': 'Анекдоты',
-  'humor_prose': 'Юмористическая проза',
-  'humor_verse': 'Юмористические стихи',
-  'humor': 'Юмористическая литература',
+                          case 'last-name': {
+                            this.titleInfo.author[index].lastName = authorChild.textContent as string
+                            break
+                          }
 
-  'home_cooking': 'Кулинария',
-  'home_pets': 'Домашние животные',
-  'home_crafts': 'Хобби и ремесла',
-  'home_entertain': 'Развлечения',
-  'home_health': 'Здоровье',
-  'home_garden': 'Сад и огород',
-  'home_diy': 'Сделай сам',
-  'home_sport': 'Спорт',
-  'home_sex': 'Эротика',
-  'home': 'Домоводство'
+                          case 'home-page': {
+                            this.titleInfo.author[index].homePage = authorChild.textContent as string
+                            break
+                          }
+
+                          case 'email': {
+                            this.titleInfo.author[index].email = authorChild.textContent as string
+                            break
+                          }
+
+                        }
+                      }
+                      break
+                    }
+
+                    case 'genre': {
+                      if (!this.titleInfo.genre) this.titleInfo.genre = []
+                      this.titleInfo.genre.push(titleChild.textContent as string)
+                      break
+                    }
+
+                    case 'annotation': {
+                      if (!this.titleInfo.annotation) this.titleInfo.annotation = []
+                      this.titleInfo.annotation.push(
+                        this.nodeFormat(titleChild.children, 'annotation')
+                      )
+                      break
+                    }
+
+                    case 'lang': {
+                      this.titleInfo.lang = titleChild.textContent as string
+                      break
+                    }
+
+                    case 'src-lang': {
+                      this.titleInfo.srcLang = titleChild.textContent as string
+                      break
+                    }
+
+                  }
+                }
+                break
+              }
+
+            }
+          }
+          break
+        }
+
+        case 'body': {
+          for (const bodyChild of segment.children) {
+            switch (bodyChild.nodeName) {
+
+              case 'title': {
+                if (!this.body.title) this.body.title = []
+                this.body.title.push(
+                  this.nodeFormat(bodyChild.children, 'bookTitle')
+                )
+                break
+              }
+
+              case 'section': {
+                const chapterIndex = this.body.chapters.push(new Chapter()) - 1
+
+                for (const sectionChild of bodyChild.children) {
+                  switch (sectionChild.nodeName) {
+
+                    case 'title': {
+
+                      this.body.chapters[chapterIndex].title.push(
+                        this.nodeFormat(sectionChild.children, 'title')
+                      )
+                      break
+                    }
+                    
+                    case 'p': {
+                      this.body.chapters[chapterIndex].content.push(
+                        this.nodeFormat(sectionChild.childNodes, 'intent')
+                      )
+                      break
+                    }
+
+                    case 'empty-line':{
+                      this.body.chapters[chapterIndex].content.push({
+                        classList: ['emptyLine'],
+                        children: []
+                      })
+                      break
+                    }
+
+                    case 'section': {
+                      const partIndex = this.body.chapters[chapterIndex].parts.push(new Chapter()) - 1
+                      
+                      for (const sectionPartChild of sectionChild.children) {
+                        switch (sectionPartChild.nodeName) {
+
+                          case 'title': {
+                            this.body.chapters[chapterIndex].parts[partIndex].title.push(
+                              this.nodeFormat(sectionPartChild.children, 'title')
+                            )
+                            break
+                          }
+                          
+                          case 'p': {
+                            this.body.chapters[chapterIndex].parts[partIndex].content.push(
+                              this.nodeFormat(sectionPartChild.childNodes, 'intent')
+                            )
+                            break
+                          }
+
+                          case 'empty-line':{
+                            this.body.chapters[chapterIndex].parts[partIndex].content.push({
+                              classList: ['emptyLine'],
+                              children: []
+                            })
+                            break
+                          }
+
+                        }
+
+                      }
+                      break
+                    }
+
+                  }
+                }
+              }
+
+            }
+          }
+          break
+        }
+
+      }
+    }
+  }
+
+  nodeFormat(children: NodeListOf<ChildNode> | HTMLCollection, ...classList: string[]): NodeContent {
+      const rt: NodeContent = {
+        classList: classList,
+        children: []
+      }
+
+      for (const child of children) {
+        switch(child.nodeName) {
+
+          case 'p':
+          case '#text': {
+            rt.children.push({
+              textContent: child.textContent as string,
+              tagName: ['span']
+            })
+            break
+          }
+
+          case 'strong': {
+            rt.children.push({
+              textContent: child.textContent as string,
+              tagName: [child.nodeName]
+            })
+            break
+          }
+
+          case 'emphasis': {
+            rt.children.push({
+              textContent: child.textContent as string,
+              tagName: ['em']
+            })
+            break
+          }
+
+        }
+      }
+
+      return rt
+    }
 }
